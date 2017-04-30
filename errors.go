@@ -40,11 +40,11 @@ func XAttrErrorIsFatal(err error) bool {
     switch err.(type) {
         case nil:
             return false
-        case *XAttrErrorAttributeNotFound:
+        case XAttrErrorAttributeNotFound:
             return false
-        case *XAttrErrorNoDataAvailable:
+        case XAttrErrorNoDataAvailable:
             return false
-        case *XAttrErrorResultTooLarge:
+        case XAttrErrorResultTooLarge:
             return true
         default:
             return true
