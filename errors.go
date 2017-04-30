@@ -1,43 +1,34 @@
 package xattr
 
+import "errors"
+import "os"
+
+var XAttrErrorAttributeNotFound = errors.New("attribute not found")
+var XAttrErrorNoDataAvailable = errors.New("no data available")
+var XAttrErrorResultTooLarge = errors.New("result too large")
+
 func syscallErrorToXAttrError(err error) error {
     if err == nil {
         return nil
     }
     switch err.Error() {
         case "attribute not found":
-            return XAttrErrorAttributeNotFound{}
+            return XAttrErrorAttributeNotFound
         case "errno 0":
             return nil
         case "no data available":
-            return XAttrErrorNoDataAvailable{}
+            return XAttrErrorNoDataAvailable
         case "result too large":
-            return XAttrErrorResultTooLarge{}
+            return XAttrErrorResultTooLarge
+        case "permission denied":
+            return os.ErrPermission
         default:
             return err
     }
 }
 
-type XAttrErrorAttributeNotFound struct { error }
-
-func (e XAttrErrorAttributeNotFound) Error() string {
-    return "attribute not found"
-}
-
-type XAttrErrorNoDataAvailable struct { error }
-
-func (e XAttrErrorNoDataAvailable) Error() string {
-    return "no data available"
-}
-
-type XAttrErrorResultTooLarge struct { error }
-
-func (e XAttrErrorResultTooLarge) Error() string {
-    return "result too large"
-}
-
 func XAttrErrorIsFatal(err error) bool {
-    switch err.(type) {
+    switch err {
         case nil:
             return false
         case XAttrErrorAttributeNotFound:
@@ -45,6 +36,8 @@ func XAttrErrorIsFatal(err error) bool {
         case XAttrErrorNoDataAvailable:
             return false
         case XAttrErrorResultTooLarge:
+            return true
+        case os.ErrPermission:
             return true
         default:
             return true

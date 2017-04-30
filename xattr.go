@@ -8,7 +8,7 @@ func Remove(filePath string, xattrName string) error {
 
 func Has(filePath string, xattrName string) (bool, error) {
     _, err := GetBytes(filePath, xattrName)
-    switch syscallErrorToXAttrError(err).(type) {
+    switch syscallErrorToXAttrError(err) {
         case nil:
             return true, nil
         case XAttrErrorAttributeNotFound:
